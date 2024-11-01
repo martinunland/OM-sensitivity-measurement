@@ -1,11 +1,12 @@
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Dict
-from src.constants import DISCRIMINATOR_CLOCK
+from src.constants import DISCRIMINATOR_CLOCK, CHUNK_SPACING_IN_SECONDS
 from scipy.special import gammaln
 
 @dataclass
 class ChannelChunkData:
+    """Container for processed PMT channel data within a time chunk."""
     charge: np.ndarray
     timestamp: np.ndarray
     timestamp_utc: np.ndarray
@@ -13,6 +14,8 @@ class ChannelChunkData:
     t_utc_max: float
         
 class SingleFileProcessor:
+    """Processes single data files into analyzable chunks."""
+
     def __init__(self, fname:str, time:float):
         self.signal = []
         self.background = []
@@ -23,13 +26,17 @@ class SingleFileProcessor:
         
         
     def process_appended_data(self):
+        """Sorts and chunks the accumulated data for the current channel.
+        Splits data into chunks when time gaps > 0.05s (CHUNK_SPACING_IN_SECONDS) are detected.
+        """
+
         argsort = np.argsort(self.__timestamps)
         utc_times = np.array(self.__utc_times)[argsort]
         charges = np.array(self.__charges)[argsort]
         timestamps = np.array(self.__timestamps)[argsort]/DISCRIMINATOR_CLOCK # Converting to seconds
 
         ts2_diff = np.diff(utc_times)
-        split_indices = np.where(ts2_diff > 0.05)[0] + 1
+        split_indices = np.where(ts2_diff > CHUNK_SPACING_IN_SECONDS)[0] + 1
         starts = np.insert(split_indices, 0, 0)
         ends = np.append(split_indices, utc_times.size)
         
@@ -43,19 +50,26 @@ class SingleFileProcessor:
                                                        np.amax(utc_times[start:end]))
     
     def parse_initial_line(self, line: str):
+        """Extracts initial timestamp and UTC time from file header."""
         # Getting first timestamp, saved timestamps are relative to the initial timestamp to save space
         self.__t0_timestamp = int(line.split()[0].split("#")[1]) 
         self.__t0_utc = np.float128(line.split()[1])
 
     
     def parse_data_line(self, line: List[str]):
+        """Parses a single data line containing charge and timing info."""
         charge, timestamp, utc_time = line.split()
         self.__charges.append(float(charge))
         self.__timestamps.append(int(timestamp) + self.__t0_timestamp) # Saved timestamps are relative to the initial timestamp to save space
         self.__utc_times.append(np.float128(utc_time) + self.__t0_utc)
     
     def process_file(self, fname: str):
-        """Opens the file and processes the data for each channel, appending data into chunks."""
+        """Reads and processes the data file line by line.
+        Format expected:
+        - First line: initial timestamp and UTC
+        - Second line: first channel number
+        - Following lines: charge, timestamp, UTC time
+        """
         with open(fname, "r") as f:
             self.parse_initial_line(next(f)) # Initial line contains the first timestamp and the first UTC time
             self.__current_channel = int(next(f).split("#")[1]) #second line contains the first channel
