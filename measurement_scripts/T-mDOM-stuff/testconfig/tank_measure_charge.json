@@ -1,0 +1,16 @@
+{
+    "config": {},
+    "expectedValues": {},
+    "args": {
+        "nmeas": 20,
+        "nsamples": 64,
+        "starting_index": 0,
+        "trigger_config": "all",
+        "channels": [],
+        "baseline": 3600,
+        "laser_frequency": 4000,
+        "trigger_channel": "disc",
+        "discriminator_threshold": 0.002,
+        "rapcal_time": 1
+    }
+}

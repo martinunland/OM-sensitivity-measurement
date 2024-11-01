@@ -50,6 +50,7 @@ class CoordinateSystem:
     _mDOM_z = None
     _R = None
     _tilt_shift = 3.0
+
     def set_fibre_distance(self, distance):
         self._R = distance
         
@@ -80,8 +81,6 @@ class CoordinateSystem:
     def calculate_position(self, theta: float, phi: float)-> Position:
         assert self._mDOM_x is not None and self._mDOM_z is not None, "call set_mDOM_position() and set the global coordinates of the module first!"
         assert self._R is not None, "call set_fibre_distance() and set distance fibre-mdom centre"
-         
-        
         
         x,z = self._theta_to_x_z(theta) #Light output should be at these coordinates w.r.t. mDOM centre as 0,0
         x,z = self._mDOM_to_global_coordinates(x,z)
@@ -100,6 +99,7 @@ def log_current(log_file):
     mid_time = (stop+start)*0.5 
     with open(log_file, "a") as f:
         f.write(f"{mid_time}\t{c1}\t{c1e}\n")
+        
         
 def log_state(theta, phi, log_file):
     with open(log_file, "a") as f:
