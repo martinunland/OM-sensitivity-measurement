@@ -21,9 +21,9 @@ The pipeline processes raw data from mDOM measurements, handling:
 │   ├── single_file_processor.py  # Raw data file processing
 │   ├── analysis_mDOM_position.py # module position-dependent analysis
 │   └── reference_diode.py    # Reference diode data handling
-│── 0_dark_rate_gain_calibration.py  # Dark rate and gain analysis
-│── 1_first_level.py      # Initial data processing
-│── 2_second_level.py     # Advanced analysis and fitting
+│── 0_process_raw_files.py  # Initial data processing
+│── 1_calibrate_gain.py      # Dark rate and gain analysis
+│── 2_analyse_detection.py     # Further analysis and fitting
 │── compile_summary_files.py  # Results compilation
 ```
 
@@ -31,26 +31,23 @@ The pipeline processes raw data from mDOM measurements, handling:
 
 ### Data Processing Pipeline
 
-0. **Calibration** (`0_dark_rate_gain_calibration.py`):
-   - Performs PMT gain calibration with dark rate charge
-   - Fits single Gaussian to charge distributions
-    If this step is performed, check further analysis in "mDOM_passing_threshold" notebook
-
-1. **First Level Processing** (`1_first_level.py`):
+1. **First Level Processing** (`0_process_raw_files.py`):
    - Reads raw measurement data
    - Processes measurement stages (theta-phi positions)
    - Outputs pickled data for each theta position
 
-2. **Second Level Processing** (`2_second_level.py`):
+0. **Calibration** (`1_calibrate_gain.py`):
+   - Performs PMT gain calibration with dark rate charge
+   - Fits single Gaussian to charge distributions
+    If this step is performed, check further analysis in "notebooks/mDOM_passing_threshold" notebook
+
+2. **Second Level Processing** (`2_analyse_detection.py`):
    - Performs detailed signal analysis
    - Applies trigger loss corrections
    - Fits signal and background models
    - Generates summary data files
 
-## Constants and Parameters
+## Further analysis
 
-Key parameters in `constants.py`:
-- Laser frequency: 4000 Hz
-- Discriminator clock: 960 MHz
-- ADC clock: 120 MHz
-- Time window: 10μs
+The data processed by the pipeline, is further investigated in the notebooks inside the folder "notebooks".
+Data_vs_MC.ipynb demonstrates how the data and simulation are compared.

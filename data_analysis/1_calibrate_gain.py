@@ -78,15 +78,13 @@ def process_pickle(fname:str):
             for wavelength, pmt_data in data.PMT_data[PMT].items():
                 try:
                     mu, muerr, sigma, sigmaerr, gof = fit_gaussian(pmt_data.background_charge_x, pmt_data.background_charge_h, PMT)
-                    np.savetxt(f"histogram_darkrate_{wavelength}_{PMT}_{phi}", np.array([pmt_data.background_charge_x, pmt_data.background_charge_h]).T)
-                    print(mu, muerr, sigma, sigmaerr, gof)
-                    # with open(output_filename, "a") as f:
-                    #     for val in [PMT, phi, wavelength]:
-                    #         f.write(f"{val}\t")
-                    #     for val in [mu, muerr, sigma, sigmaerr, gof]:
-                    #         f.write(f"{val:.5g}\t")
-                    #     f.write("\n")
-                    exit()
+                    with open(output_filename, "a") as f:
+                        for val in [PMT, phi, wavelength]:
+                            f.write(f"{val}\t")
+                        for val in [mu, muerr, sigma, sigmaerr, gof]:
+                            f.write(f"{val:.5g}\t")
+                        f.write("\n")
+
                 except Exception as err:
                     print(err)
                     pass
@@ -100,14 +98,14 @@ def main():
     path = "/HDD/backuped/Promotion_data/Postdoc/240822_mDOM_efficiency/pre_analysis/output_data/"
     fnames = [path+fname for fname in os.listdir(path) if "_gain_fits.dat" in fname]
 
-    # with open(path+"241014_gain_fits.dat", "a") as f:
-    #     for fname in fnames:
-    #             theta = fname.split("theta_")[1].split("_")[0]
-    #             with open(fname, "r") as f2:
-    #                 for line in f2:
-    #                     if "#" not in line:
-    #                         f.write(theta + "\t")
-    #                         f.write(line)
+    with open(path+"241014_gain_fits.dat", "a") as f:
+        for fname in fnames:
+                theta = fname.split("theta_")[1].split("_")[0]
+                with open(fname, "r") as f2:
+                    for line in f2:
+                        if "#" not in line:
+                            f.write(theta + "\t")
+                            f.write(line)
 
 if __name__ == "__main__":
     main()
