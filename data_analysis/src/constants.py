@@ -1,0 +1,6 @@
+LASER_FREQ = 4000.
+DISCRIMINATOR_CLOCK = 960e+6
+ADC_CLOCK = 120e+6
+TIME_WINDOW = 10e-6
+AF_PROB = 0.0565  # mean after pulse probability from AT
+DEAD_TIME = 500e-9
